@@ -1,15 +1,16 @@
 package fh.ooe.mc.mobilesportsapp;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,7 +89,7 @@ public class NavigationDrawerFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		// Indicate that this fragment would like to influence the set of
 		// actions in the action bar.
-		setHasOptionsMenu(true);
+		setHasOptionsMenu(false);
 	}
 
 	@Override
@@ -104,14 +105,7 @@ public class NavigationDrawerFragment extends Fragment {
 						selectItem(position);
 					}
 				});
-		mDrawerListView.setAdapter(
-				new ArrayAdapter<String>(getActionBar().getThemedContext(),
-						android.R.layout.simple_list_item_activated_1,
-						android.R.id.text1,
-						new String[] { getString(R.string.title_section1),
-								getString(R.string.title_section2),
-								getString(R.string.title_section3), }));
-		mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+		
 		return mDrawerListView;
 	}
 
@@ -130,7 +124,7 @@ public class NavigationDrawerFragment extends Fragment {
 	 *            The DrawerLayout containing this fragment's UI.
 	 */
 	public void setUp(int fragmentId, DrawerLayout drawerLayout) {
-		mFragmentContainerView = getActivity().findViewById(fragmentId);
+		mFragmentContainerView = ((ActionBarActivity)getActivity()).findViewById(fragmentId);
 		mDrawerLayout = drawerLayout;
 
 		// set a custom shadow that overlays the main content when the drawer
@@ -139,14 +133,24 @@ public class NavigationDrawerFragment extends Fragment {
 				GravityCompat.START);
 		// set up the drawer's list view with items and click listener
 
-		ActionBar actionBar = getActionBar();
+		mDrawerListView.setAdapter(
+				new ArrayAdapter<String>(((ActionBarActivity)getActivity()).getSupportActionBar().getThemedContext(),
+						android.R.layout.simple_list_item_activated_1,
+						android.R.id.text1,
+						new String[] { getString(R.string.title_section1),
+								getString(R.string.title_section2),
+								getString(R.string.title_section3), }));
+		
+		mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+		
+		ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the navigation drawer and the action bar app icon.
 		mDrawerToggle = new ActionBarDrawerToggle(
-				getActivity(), /* host Activity */
+				(ActionBarActivity) getActivity(), /* host Activity */
 				mDrawerLayout, /* DrawerLayout object */
 				R.drawable.ic_drawer, /*
 										 * nav drawer image to replace 'Up' caret
@@ -254,7 +258,7 @@ public class NavigationDrawerFragment extends Fragment {
 		// Forward the new configuration the drawer toggle component.
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-
+/*
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// If the drawer is open, show the global app actions in the action bar.
@@ -282,6 +286,7 @@ public class NavigationDrawerFragment extends Fragment {
 
 		return super.onOptionsItemSelected(item);
 	}
+	*/
 
 	/**
 	 * Per the navigation drawer design guidelines, updates the action bar to
@@ -289,14 +294,14 @@ public class NavigationDrawerFragment extends Fragment {
 	 * screen.
 	 */
 	private void showGlobalContextActionBar() {
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setTitle(R.string.app_name);
 	}
 
 	private ActionBar getActionBar() {
-		return getActivity().getActionBar();
+		return ((ActionBarActivity)getActivity()).getSupportActionBar();
 	}
 
 	/**
