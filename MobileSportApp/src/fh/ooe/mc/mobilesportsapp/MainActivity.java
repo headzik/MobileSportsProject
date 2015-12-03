@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
@@ -42,6 +43,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
+		ProgressBar p = (ProgressBar) findViewById(R.id.progressBar);
+		p.setProgress(50);
+		
+		
 		/*
 		 * mNavigationDrawerFragment = (NavigationDrawerFragment)
 		 * getSupportFragmentManager()
@@ -70,7 +75,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 		TextView tvx = (TextView) findViewById(R.id.tvx);
 		TextView tvy = (TextView) findViewById(R.id.tvy);
 		TextView tvz = (TextView) findViewById(R.id.tvz);
-		
+
 		tvx.setText("X: " + String.valueOf(event.values[0]));
 		tvy.setText("Y: " + String.valueOf(event.values[1]));
 		tvz.setText("Z: " + String.valueOf(event.values[2]));
