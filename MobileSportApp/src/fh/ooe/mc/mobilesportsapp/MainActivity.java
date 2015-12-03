@@ -1,26 +1,35 @@
 package fh.ooe.mc.mobilesportsapp;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
+import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements SensorEventListener {
 	// implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
 	 */
-	private NavigationDrawerFragment mNavigationDrawerFragment;
+	// private NavigationDrawerFragment mNavigationDrawerFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
 	 * {@link #restoreActionBar()}.
 	 */
 	private CharSequence mTitle;
+	private SensorManager mSensorManager;
+	private Sensor mSensor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +38,9 @@ public class MainActivity extends ActionBarActivity {
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 		/*
 		 * mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -40,6 +52,28 @@ public class MainActivity extends ActionBarActivity {
 		 * (DrawerLayout) findViewById(R.id.drawer_layout));
 		 */
 
+	}
+
+	protected void onResume() {
+		super.onResume();
+		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+	}
+
+	protected void onPause() {
+		super.onPause();
+		mSensorManager.unregisterListener(this);
+	}
+
+	public void onSensorChanged(SensorEvent event) {
+		if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
+			return;
+		TextView tvx = (TextView) findViewById(R.id.tvx);
+		TextView tvy = (TextView) findViewById(R.id.tvy);
+		TextView tvz = (TextView) findViewById(R.id.tvz);
+		
+		tvx.setText("X: " + String.valueOf(event.values[0]));
+		tvy.setText("Y: " + String.valueOf(event.values[1]));
+		tvz.setText("Z: " + String.valueOf(event.values[2]));
 	}
 
 	/*
@@ -54,6 +88,7 @@ public class MainActivity extends ActionBarActivity {
 	 * getString(R.string.title_section2); break; case 3: mTitle =
 	 * getString(R.string.title_section3); break; } }
 	 */
+
 	public void restoreActionBar() {
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -84,6 +119,12 @@ public class MainActivity extends ActionBarActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
