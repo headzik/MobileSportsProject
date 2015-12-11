@@ -97,14 +97,7 @@ public class NavigationDrawerFragment extends Fragment {
 			Bundle savedInstanceState) {
 		mDrawerListView = (ListView) inflater
 				.inflate(R.layout.fragment_navigation_drawer, container, false);
-		mDrawerListView
-				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
-							int position, long id) {
-						selectItem(position);
-					}
-				});
+		
 		
 		return mDrawerListView;
 	}
@@ -126,7 +119,14 @@ public class NavigationDrawerFragment extends Fragment {
 	public void setUp(int fragmentId, DrawerLayout drawerLayout) {
 		mFragmentContainerView = ((ActionBarActivity)getActivity()).findViewById(fragmentId);
 		mDrawerLayout = drawerLayout;
-
+		mDrawerListView
+		.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				selectItem(position);
+			}
+		});
 		// set a custom shadow that overlays the main content when the drawer
 		// opens
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
@@ -138,8 +138,7 @@ public class NavigationDrawerFragment extends Fragment {
 						android.R.layout.simple_list_item_activated_1,
 						android.R.id.text1,
 						new String[] { getString(R.string.title_section1),
-								getString(R.string.title_section2),
-								getString(R.string.title_section3), }));
+								 }));
 		
 		mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
 		
@@ -258,7 +257,7 @@ public class NavigationDrawerFragment extends Fragment {
 		// Forward the new configuration the drawer toggle component.
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-/*
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// If the drawer is open, show the global app actions in the action bar.
@@ -286,7 +285,7 @@ public class NavigationDrawerFragment extends Fragment {
 
 		return super.onOptionsItemSelected(item);
 	}
-	*/
+	
 
 	/**
 	 * Per the navigation drawer design guidelines, updates the action bar to

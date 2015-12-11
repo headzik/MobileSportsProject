@@ -1,28 +1,34 @@
 package fh.ooe.mc.mobilesportsapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import fh.ooe.mc.mobilesportsapp.NavigationDrawerFragment.NavigationDrawerCallbacks;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
-	// implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class MainActivity extends ActionBarActivity implements SensorEventListener, NavigationDrawerCallbacks {
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
 	 */
-	// private NavigationDrawerFragment mNavigationDrawerFragment;
+	private NavigationDrawerFragment mNavigationDrawerFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
@@ -45,17 +51,13 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
 		ProgressBar p = (ProgressBar) findViewById(R.id.progressBar);
 		p.setProgress(50);
-		
-		
-		/*
-		 * mNavigationDrawerFragment = (NavigationDrawerFragment)
-		 * getSupportFragmentManager()
-		 * .findFragmentById(R.id.navigation_drawer); mTitle = getTitle();
-		 * 
-		 * // Set up the drawer.
-		 * mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
-		 * (DrawerLayout) findViewById(R.id.drawer_layout));
-		 */
+
+		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.navigation_drawer);
+		mTitle = getTitle();
+
+		// Set up the drawer.
+		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
 	}
 
@@ -81,18 +83,26 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 		tvz.setText("Z: " + String.valueOf(event.values[2]));
 	}
 
-	/*
-	 * @Override public void onNavigationDrawerItemSelected(int position) { //
-	 * update the main content by replacing fragments FragmentManager
-	 * fragmentManager = getSupportFragmentManager();
-	 * fragmentManager.beginTransaction().replace(R.id.container,
-	 * PlaceholderFragment.newInstance(position + 1)).commit(); }
-	 * 
-	 * public void onSectionAttached(int number) { switch (number) { case 1:
-	 * mTitle = getString(R.string.title_section1); break; case 2: mTitle =
-	 * getString(R.string.title_section2); break; case 3: mTitle =
-	 * getString(R.string.title_section3); break; } }
-	 */
+	@Override
+	public void onNavigationDrawerItemSelected(int position) {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+				.commit();
+	}
+
+	public void onSectionAttached(int number) {
+		switch (number) {
+		case 1:
+			mTitle = getString(R.string.title_section1);
+			break;
+		case 2:
+			mTitle = getString(R.string.title_section2);
+			break;
+		case 3:
+			mTitle = getString(R.string.title_section3);
+			break;
+		}
+	}
 
 	public void restoreActionBar() {
 		ActionBar actionBar = getSupportActionBar();
@@ -135,28 +145,34 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	/*
-	 * public static class PlaceholderFragment extends Fragment {
-	 * 
-	 * private static final String ARG_SECTION_NUMBER = "section_number";
-	 * 
-	 * public static PlaceholderFragment newInstance(int sectionNumber) {
-	 * PlaceholderFragment fragment = new PlaceholderFragment(); Bundle args =
-	 * new Bundle(); args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-	 * fragment.setArguments(args); return fragment; }
-	 * 
-	 * public PlaceholderFragment() { }
-	 * 
-	 * @Override public View onCreateView(LayoutInflater inflater, ViewGroup
-	 * container, Bundle savedInstanceState) { View rootView =
-	 * inflater.inflate(R.layout.fragment_main, container, false); return
-	 * rootView; }
-	 * 
-	 * @Override public void onAttach(Activity activity) {
-	 * super.onAttach(activity); ((MainActivity) activity).onSectionAttached(
-	 * getArguments().getInt(ARG_SECTION_NUMBER)); }
-	 * 
-	 * }
-	 */
+
+	public static class PlaceholderFragment extends Fragment {
+
+		private static final String ARG_SECTION_NUMBER = "section_number";
+
+		public static PlaceholderFragment newInstance(int sectionNumber) {
+			PlaceholderFragment fragment = new PlaceholderFragment();
+			Bundle args = new Bundle();
+			args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+			fragment.setArguments(args);
+			return fragment;
+		}
+
+		public PlaceholderFragment() {
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+			return rootView;
+		}
+
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+			((MainActivity) activity).onSectionAttached(getArguments().getInt(ARG_SECTION_NUMBER));
+		}
+
+	}
 
 }

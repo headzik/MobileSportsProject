@@ -30,6 +30,10 @@
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +61,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@color/accent"
                         android:gravity="bottom|center_horizontal"
                         android:text="700"
                         android:textSize="40sp" />
@@ -67,7 +70,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@color/primary_dark"
                         android:gravity="top|center_horizontal"
                         android:text="@string/steps_total"
                         android:textColor="@color/text_sec"
@@ -75,38 +77,193 @@
                 </LinearLayout>
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/tvx"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="x axis" />
+                android:layout_height="50dp" />
 
-            <TextView
-                android:id="@+id/tvy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="y axis" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/tvz"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="z axis" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_calories"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/circle_shape"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="65"
+                        android:progressDrawable="@drawable/circular_progress_bar" />
+
+                    <LinearLayout
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:id="@+id/tv_calories"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="bottom|center_horizontal"
+                            android:text="700"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="top|center_horizontal"
+                            android:text="Calories"
+                            android:textColor="@color/text_sec"
+                            android:textSize="5sp" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_km"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/circle_shape"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="65"
+                        android:progressDrawable="@drawable/circular_progress_bar" />
+
+                    <LinearLayout
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:id="@+id/tv_km"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="bottom|center_horizontal"
+                            android:text="700"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="top|center_horizontal"
+                            android:text="Kilometers"
+                            android:textColor="@color/text_sec"
+                            android:textSize="5sp" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_kmh"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/circle_shape"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="65"
+                        android:progressDrawable="@drawable/circular_progress_bar" />
+
+                    <LinearLayout
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:id="@+id/tv_kmh"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="bottom|center_horizontal"
+                            android:text="700"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="top|center_horizontal"
+                            android:text="avg. Speed"
+                            android:textColor="@color/text_sec"
+                            android:textSize="5sp" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+            </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
 
-        <!--
+    <TextView
+        android:id="@+id/tvx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="x axis" />
+
+    <TextView
+        android:id="@+id/tvy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="y axis" />
+
+    <TextView
+        android:id="@+id/tvz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="z axis" />
+
+    <!--
          android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right
          languages and on the right side for right-to-left languages.
          If you're not building against API 17 or higher, use
          android:layout_gravity="left" instead.
-        -->
-    </LinearLayout>
+    -->
+
+
     <!--
          The drawer is given a fixed width in dp and extends the full height of
          the container.
     -->
-    <!--
+    
     <fragment
         android:id="@+id/navigation_drawer"
         android:name="fh.ooe.mc.mobilesportsapp.NavigationDrawerFragment"
@@ -114,6 +271,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         tools:layout="@layout/fragment_navigation_drawer" />
-    -->
+    
 
 </android.support.v4.widget.DrawerLayout>
