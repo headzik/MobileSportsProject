@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 		mTvDistance = (TextView) findViewById(R.id.tv_km);
 		mTvSpeed = (TextView) findViewById(R.id.tv_kmh);
 
-		mTreshold = 5;
+		mTreshold = 10;
 		mCurrentY = 0;
 		mPreviousY = 0;
 		mNumSteps = 0;
@@ -118,8 +118,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-				.commit();
+		Log.i("hey", String.valueOf(position));
+		switch (position) {
+		case 0:
+			Log.i("ho", "ho");
+			fragmentManager.beginTransaction().replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+					.commit();
+			break;
+		case 1:
+			Log.i("hey", "ho");
+			fragmentManager.beginTransaction().replace(R.id.container, new StatisticsFragment()).commit();
+			break;
+		}
+
 	}
 
 	public void onSectionAttached(int number) {
@@ -202,42 +213,42 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 	}
 
 	private int updateSmallCircles() {
-		if (mEtHeight.getText() != null && mEtWeight.getText() != null){
-		double height = Integer.valueOf(mEtHeight.getText().toString());
-		double weight = Integer.valueOf(mEtWeight.getText().toString());
+		if (mEtHeight.getText() != null && mEtWeight.getText() != null) {
+			double height = Integer.valueOf(mEtHeight.getText().toString());
+			double weight = Integer.valueOf(mEtWeight.getText().toString());
 
-		final double walkingFactor = 0.57;
-		double CaloriesBurnedPerMile;
-		double strip;
-		double stepCountMile; // step/mile
-		double conversationFactor;
-		double CaloriesBurned;
-		NumberFormat formatter = new DecimalFormat("#0.00");
-		double distance;
-		
-		CaloriesBurnedPerMile = walkingFactor * (weight * 2.2);
-		strip = height * 0.415;
-		stepCountMile = 160934.4 / strip;
-		conversationFactor = CaloriesBurnedPerMile / stepCountMile;
-		
-		CaloriesBurned = mNumSteps * conversationFactor;
-		distance = (mNumSteps * strip) / 100000;
-		
-		mTvCal.setText(String.valueOf(formatter.format(CaloriesBurned)));
-		mTvDistance.setText(String.valueOf(formatter.format(distance)));
-		
-		height = height/100;
-		Log.i("hey", String.valueOf(height) + " w:" + String.valueOf(weight));
-		double bmi = weight / (height*height);
-		mTvSpeed.setText(String.valueOf(formatter.format(bmi)));
-		if (bmi < 18.5){
-					mProgressBarSpeed.setBackgroundColor(Color.RED);
+			final double walkingFactor = 0.57;
+			double CaloriesBurnedPerMile;
+			double strip;
+			double stepCountMile; // step/mile
+			double conversationFactor;
+			double CaloriesBurned;
+			NumberFormat formatter = new DecimalFormat("#0.00");
+			double distance;
 
-		} else if (bmi < 24.9){
-			mProgressBarSpeed.setBackgroundColor(Color.GREEN);
-		}else{
-			mProgressBarSpeed.setBackgroundColor(Color.RED);
-		}
+			CaloriesBurnedPerMile = walkingFactor * (weight * 2.2);
+			strip = height * 0.415;
+			stepCountMile = 160934.4 / strip;
+			conversationFactor = CaloriesBurnedPerMile / stepCountMile;
+
+			CaloriesBurned = mNumSteps * conversationFactor;
+			distance = (mNumSteps * strip) / 100000;
+
+			mTvCal.setText(String.valueOf(formatter.format(CaloriesBurned)));
+			mTvDistance.setText(String.valueOf(formatter.format(distance)));
+
+			height = height / 100;
+			Log.i("hey", String.valueOf(height) + " w:" + String.valueOf(weight));
+			double bmi = weight / (height * height);
+			mTvSpeed.setText(String.valueOf(formatter.format(bmi)));
+			if (bmi < 18.5) {
+				mProgressBarSpeed.setBackgroundColor(Color.RED);
+
+			} else if (bmi < 24.9) {
+				mProgressBarSpeed.setBackgroundColor(Color.GREEN);
+			} else {
+				mProgressBarSpeed.setBackgroundColor(Color.RED);
+			}
 		}
 		return 0;
 	}
@@ -254,7 +265,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 				mNumSteps++;
 				mTvNumSteps.setText(String.valueOf(mNumSteps));
 				if (mNumSteps > 80)
-				updateSmallCircles();
+					updateSmallCircles();
 				runOnUiThread(new Runnable() {
 
 					@Override
@@ -262,7 +273,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 						float percent = (float) ((float) mNumSteps / (float) STEPS_TO_REACH) * 100;
 						mProgressBarNumSteps.setProgress((int) percent);
 						mProgressBarNumSteps.refreshDrawableState();
-						
+
 					}
 				});
 			}
