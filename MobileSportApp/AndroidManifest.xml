@@ -4,9 +4,11 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    
     <uses-sdk
         android:minSdkVersion="19"
         android:targetSdkVersion="21" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
 
     <application
         android:allowBackup="true"
@@ -19,9 +21,14 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="fh.ooe.mc.mobilesportsapp.HardwareConnectorService">
+        </service>
     </application>
 
 </manifest>

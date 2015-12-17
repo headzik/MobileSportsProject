@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="C:/Users/Katharina/android-sdks/extras/android/support/v4/android-support-v4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Katharina/android-sdks/extras/android/support/v13/android-support-v13.jar"/>
 	<classpathentry kind="lib" path="libs/mpandroidchartlibrary-2-1-6.jar"/>
+	<classpathentry kind="lib" path="libs/androidapi.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
