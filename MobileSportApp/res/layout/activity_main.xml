@@ -62,7 +62,6 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="bottom|center_horizontal"
-                        android:text="700"
                         android:textSize="40sp" />
 
                     <TextView
@@ -83,7 +82,7 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal" >
 
                 <View
@@ -104,7 +103,7 @@
                         android:gravity="center_vertical|center_horizontal"
                         android:indeterminate="false"
                         android:max="100"
-                        android:progress="65"
+                        android:progress="100"
                         android:progressDrawable="@drawable/circular_progress_bar" />
 
                     <LinearLayout
@@ -118,7 +117,6 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="bottom|center_horizontal"
-                            android:text="700"
                             android:textSize="20sp" />
 
                         <TextView
@@ -150,7 +148,7 @@
                         android:gravity="center_vertical|center_horizontal"
                         android:indeterminate="false"
                         android:max="100"
-                        android:progress="65"
+                        android:progress="100"
                         android:progressDrawable="@drawable/circular_progress_bar" />
 
                     <LinearLayout
@@ -164,7 +162,6 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="bottom|center_horizontal"
-                            android:text="700"
                             android:textSize="20sp" />
 
                         <TextView
@@ -196,7 +193,7 @@
                         android:gravity="center_vertical|center_horizontal"
                         android:indeterminate="false"
                         android:max="100"
-                        android:progress="65"
+                        android:progress="100"
                         android:progressDrawable="@drawable/circular_progress_bar" />
 
                     <LinearLayout
@@ -210,7 +207,6 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="bottom|center_horizontal"
-                            android:text="700"
                             android:textSize="20sp" />
 
                         <TextView
@@ -218,7 +214,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:gravity="top|center_horizontal"
-                            android:text="avg. Speed"
+                            android:text="BMI"
                             android:textColor="@color/text_sec"
                             android:textSize="5sp" />
                     </LinearLayout>
@@ -229,26 +225,56 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="To calculate calories and distance please enter your personal data below:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp" >
+
+                <TextView
+                    android:id="@+id/tv_height"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Height (cm):" 
+                    android:paddingRight="10dp"/>
+
+                <EditText
+                    android:id="@+id/et_height"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ccc"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp" >
+
+                <TextView
+                    android:id="@+id/tv_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weight (kg):" 
+                    android:paddingRight="10dp"/>
+
+                <EditText
+                    android:id="@+id/et_weight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ccc"
+                     />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvx"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="x axis" />
-
-    <TextView
-        android:id="@+id/tvy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="y axis" />
-
-    <TextView
-        android:id="@+id/tvz"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="z axis" />
 
     <!--
          android:layout_gravity="start" tells DrawerLayout to treat
@@ -263,7 +289,7 @@
          The drawer is given a fixed width in dp and extends the full height of
          the container.
     -->
-    
+
     <fragment
         android:id="@+id/navigation_drawer"
         android:name="fh.ooe.mc.mobilesportsapp.NavigationDrawerFragment"
@@ -271,6 +297,5 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         tools:layout="@layout/fragment_navigation_drawer" />
-    
 
 </android.support.v4.widget.DrawerLayout>

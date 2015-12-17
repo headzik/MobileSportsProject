@@ -1,7 +1,11 @@
 package fh.ooe.mc.mobilesportsapp;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,16 +17,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import fh.ooe.mc.mobilesportsapp.NavigationDrawerFragment.NavigationDrawerCallbacks;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener, NavigationDrawerCallbacks {
+public class MainActivity extends ActionBarActivity implements NavigationDrawerCallbacks {
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
@@ -36,7 +42,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 	 */
 	private CharSequence mTitle;
 	private SensorManager mSensorManager;
-	private Sensor mSensor;
+
+	private float mAcceleration;
+	private float mCurrentY;
+	private float mPreviousY;
+	private int mNumSteps;
+	private int mTreshold;
+	private TextView mTvNumSteps;
+	private ProgressBar mProgressBarNumSteps;
+	private ProgressBar mProgressBarCalories;
+	private ProgressBar mProgressBarKm;
+	private ProgressBar mProgressBarSpeed;
+	private final int STEPS_TO_REACH = 700;
+	private EditText mEtHeight;
+	private EditText mEtWeight;
+	private TextView mTvCal;
+	private TextView mTvDistance;
+	private TextView mTvSpeed;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +68,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-		ProgressBar p = (ProgressBar) findViewById(R.id.progressBar);
-		p.setProgress(50);
+		// mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
@@ -58,29 +76,43 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+		mTvNumSteps = (TextView) findViewById(R.id.tv_numsteps);
+		mProgressBarNumSteps = (ProgressBar) findViewById(R.id.progressBar);
+		mProgressBarCalories = (ProgressBar) findViewById(R.id.progressBar_calories);
+		mProgressBarKm = (ProgressBar) findViewById(R.id.progressBar_km);
+		mProgressBarSpeed = (ProgressBar) findViewById(R.id.progressBar_kmh);
+		// TODO get todays steps from server
+		mTvNumSteps.setText("0");
+		mProgressBarNumSteps.setProgress(0);
+		mEtHeight = (EditText) findViewById(R.id.et_height);
+		mEtWeight = (EditText) findViewById(R.id.et_weight);
+		mTvCal = (TextView) findViewById(R.id.tv_calories);
+		mTvDistance = (TextView) findViewById(R.id.tv_km);
+		mTvSpeed = (TextView) findViewById(R.id.tv_kmh);
+
+		mTreshold = 5;
+		mCurrentY = 0;
+		mPreviousY = 0;
+		mNumSteps = 0;
+		mAcceleration = 0.0f;
+		enableAccelerometerListening();
+
+	}
+
+	private void enableAccelerometerListening() {
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mSensorManager.registerListener(mSensorEventListener,
+				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 
 	}
 
 	protected void onResume() {
 		super.onResume();
-		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+		enableAccelerometerListening();
 	}
 
 	protected void onPause() {
 		super.onPause();
-		mSensorManager.unregisterListener(this);
-	}
-
-	public void onSensorChanged(SensorEvent event) {
-		if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
-			return;
-		TextView tvx = (TextView) findViewById(R.id.tvx);
-		TextView tvy = (TextView) findViewById(R.id.tvy);
-		TextView tvz = (TextView) findViewById(R.id.tvz);
-
-		tvx.setText("X: " + String.valueOf(event.values[0]));
-		tvy.setText("Y: " + String.valueOf(event.values[1]));
-		tvz.setText("Z: " + String.valueOf(event.values[2]));
 	}
 
 	@Override
@@ -136,12 +168,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
@@ -174,5 +200,80 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 		}
 
 	}
+
+	private int updateSmallCircles() {
+		if (mEtHeight.getText() != null && mEtWeight.getText() != null){
+		double height = Integer.valueOf(mEtHeight.getText().toString());
+		double weight = Integer.valueOf(mEtWeight.getText().toString());
+
+		final double walkingFactor = 0.57;
+		double CaloriesBurnedPerMile;
+		double strip;
+		double stepCountMile; // step/mile
+		double conversationFactor;
+		double CaloriesBurned;
+		NumberFormat formatter = new DecimalFormat("#0.00");
+		double distance;
+		
+		CaloriesBurnedPerMile = walkingFactor * (weight * 2.2);
+		strip = height * 0.415;
+		stepCountMile = 160934.4 / strip;
+		conversationFactor = CaloriesBurnedPerMile / stepCountMile;
+		
+		CaloriesBurned = mNumSteps * conversationFactor;
+		distance = (mNumSteps * strip) / 100000;
+		
+		mTvCal.setText(String.valueOf(formatter.format(CaloriesBurned)));
+		mTvDistance.setText(String.valueOf(formatter.format(distance)));
+		
+		height = height/100;
+		Log.i("hey", String.valueOf(height) + " w:" + String.valueOf(weight));
+		double bmi = weight / (height*height);
+		mTvSpeed.setText(String.valueOf(formatter.format(bmi)));
+		if (bmi < 18.5){
+					mProgressBarSpeed.setBackgroundColor(Color.RED);
+
+		} else if (bmi < 24.9){
+			mProgressBarSpeed.setBackgroundColor(Color.GREEN);
+		}else{
+			mProgressBarSpeed.setBackgroundColor(Color.RED);
+		}
+		}
+		return 0;
+	}
+
+	private SensorEventListener mSensorEventListener = new SensorEventListener() {
+
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			float x = event.values[0];
+			float y = event.values[1];
+			float z = event.values[2];
+			mCurrentY = y;
+			if (Math.abs(mCurrentY - mPreviousY) > mTreshold) {
+				mNumSteps++;
+				mTvNumSteps.setText(String.valueOf(mNumSteps));
+				if (mNumSteps > 80)
+				updateSmallCircles();
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						float percent = (float) ((float) mNumSteps / (float) STEPS_TO_REACH) * 100;
+						mProgressBarNumSteps.setProgress((int) percent);
+						mProgressBarNumSteps.refreshDrawableState();
+						
+					}
+				});
+			}
+			mPreviousY = y;
+		}
+
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+			// TODO Auto-generated method stub
+
+		}
+	};
 
 }
