@@ -71,7 +71,11 @@ public class LoginSignupActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-		
- 
+	}
+	
+	@Override
+	public void onBackPressed() {
+		finish();
+		System.exit(0);
 	}
 }

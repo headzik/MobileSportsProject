@@ -23,6 +23,9 @@ public class SignUpActivity extends Activity {
 	EditText password;
 	EditText username;
 	EditText email;
+	EditText height;
+	EditText weight;
+	EditText age;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,9 @@ public class SignUpActivity extends Activity {
 		username = (EditText) findViewById(R.id.username);
 		password = (EditText) findViewById(R.id.password);
 		email = (EditText) findViewById(R.id.email);
+		height = (EditText) findViewById(R.id.height);
+		weight = (EditText) findViewById(R.id.weight);
+		age = (EditText) findViewById(R.id.age);
  
 		signup = (Button) findViewById(R.id.signup);
 		

@@ -77,9 +77,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 				finish();
 			}
 		}
-		
 	}
-
 
 	protected void onResume() {
 		super.onResume();
