@@ -15,11 +15,14 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,9 +34,47 @@ public class HeartRateFragment extends Fragment {
 	private TextView tvAvgHeartrate;
 	private TextView tvMaxHeartrate;
 	private TextView tvMinHeartrate;
+	private TextView tvTime;
 	private Button btnStartStop;
+	private boolean activityStarted = false;
 	private ImageView ivHeart;
+	private int seconds = 0;
+	private Handler handler = new Handler();
+	private Runnable runnable = new Runnable() {
+		@Override
+		public void run() {
+			seconds++;
+
+			String x = tvHeartrate.getText().toString();
+			if (x != null && !x.equals("---")) {
+				heartValues.add(Integer.parseInt(x));
+
+				LayoutParams p = (LayoutParams) ivHeart.getLayoutParams();
+				if (p.height == 100){
+					p.height = 80;
+				}else{
+					p.height = 100;
+				}
+				ivHeart.setLayoutParams(p);
+
+			}
+			int min = seconds / 60;
+			int sec = seconds % 60;
+			String smin = String.valueOf(min);
+			String ssec = String.valueOf(sec);
+			if (min < 10) {
+				smin = "0" + smin;
+			}
+			if (sec < 10) {
+				ssec = "0" + ssec;
+			}
+			String s = smin + ":" + ssec;
+			tvTime.setText(s);
+			handler.postDelayed(this, 1000);
+		}
+	};
 	BluetoothGatt mBluetoothGatt;
+	private List<Integer> heartValues = new ArrayList<Integer>();
 	public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
 	public final static UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -59,16 +100,25 @@ public class HeartRateFragment extends Fragment {
 			if (data != null && data.length > 1) {
 				Byte b = data[1];
 				final int x = b.intValue();
-				
+
 				getActivity().runOnUiThread(new Runnable() {
-					
+
 					@Override
 					public void run() {
-						Log.i("hey", "data = " + x);	
+						Log.i("hey", "data = " + x);
 						tvHeartrate.setText(String.valueOf(x));
+						ivHeart.setImageDrawable(getResources().getDrawable(R.drawable.heart_red));
+						int avg = 0;
+						if (heartValues.size() > 0) {
+							for (int val : heartValues) {
+								avg += val;
+							}
+							avg = avg / heartValues.size();
+							tvAvgHeartrate.setText(String.valueOf(avg));
+						}
 					}
 				});
-				
+
 			}
 		}
 
@@ -136,7 +186,11 @@ public class HeartRateFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_heartrate, container, false);
 		tvHeartrate = (TextView) rootView.findViewById(R.id.tv_heartrate);
 		tvAvgHeartrate = (TextView) rootView.findViewById(R.id.tv_avgHeartrate);
-		//tvMaxHeartrate = (TextView) rootView.findViewById(id)
+		tvMaxHeartrate = (TextView) rootView.findViewById(R.id.tv_maxHeartrate);
+		tvMinHeartrate = (TextView) rootView.findViewById(R.id.tv_minHeartrate);
+		btnStartStop = (Button) rootView.findViewById(R.id.buttonStartStop);
+		ivHeart = (ImageView) rootView.findViewById(R.id.iv_heart);
+		tvTime = (TextView) rootView.findViewById(R.id.tvTime);
 		BluetoothManager btManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
 
 		BluetoothAdapter btAdapter = btManager.getAdapter();
@@ -146,6 +200,29 @@ public class HeartRateFragment extends Fragment {
 		}
 
 		btAdapter.startLeScan(leScanCallback);
+
+		btnStartStop.setOnClickListener(new OnClickListener() {
+			// Timer timer = new Timer();
+
+			@Override
+			public void onClick(View v) {
+				if (!activityStarted) {
+					btnStartStop.setBackgroundResource(R.drawable.stop);
+					seconds = 0;
+					tvTime.setText("00:00");
+					handler.postDelayed(runnable, 1000);
+
+				} else {
+					btnStartStop.setBackgroundResource(R.drawable.start);
+					
+					handler.removeCallbacks(runnable);
+					// timer.cancel();
+				}
+				activityStarted = !activityStarted;
+
+			}
+		});
+
 		return rootView;
 	}
 }
