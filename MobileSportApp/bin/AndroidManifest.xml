@@ -32,6 +32,8 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="fh.ooe.mc.mobilesportsapp.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
         android:allowBackup="true"
