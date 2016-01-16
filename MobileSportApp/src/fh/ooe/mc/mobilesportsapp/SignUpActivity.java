@@ -1,6 +1,7 @@
 package fh.ooe.mc.mobilesportsapp;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -20,6 +21,10 @@ public class SignUpActivity extends Activity {
 	String usernametxt;
 	String passwordtxt;
 	String emailtxt;
+	double heighttxt;
+	double weighttxt;
+	double agetxt;
+	
 	EditText password;
 	EditText username;
 	EditText email;
@@ -46,7 +51,10 @@ public class SignUpActivity extends Activity {
 				usernametxt = username.getText().toString();
 				passwordtxt = password.getText().toString();
 				emailtxt = email.getText().toString();
-
+				heighttxt = Double.parseDouble(height.getText().toString());
+				weighttxt = Double.parseDouble(weight.getText().toString());
+				agetxt = Double.parseDouble(age.getText().toString());
+				
 				// Force user to fill up the form
 				if (usernametxt.equals("") || passwordtxt.equals("") || emailtxt.equals("")) {
 					Toast.makeText(getApplicationContext(),
@@ -54,10 +62,14 @@ public class SignUpActivity extends Activity {
 							Toast.LENGTH_LONG).show();
 				} else {
 					// Save new user data into Parse.com Data Storage
-					ParseUser user = new ParseUser();
+					final ParseUser user = new ParseUser();
 					user.setUsername(usernametxt);
 					user.setPassword(passwordtxt);
 					user.setEmail(emailtxt);
+					user.put("height", heighttxt);
+					user.put("weight", weighttxt);
+					user.put("age", agetxt);
+					
 					user.signUpInBackground(new SignUpCallback() {
 						public void done(ParseException e) {
 							if (e == null) {
@@ -65,7 +77,12 @@ public class SignUpActivity extends Activity {
 								Toast.makeText(getApplicationContext(),
 										"Successfully Signed up, please log in.",
 										Toast.LENGTH_LONG).show();
-										finish();
+								
+								ParseObject stepCount = new ParseObject("stepCount");
+								stepCount.put("user", ParseUser.getCurrentUser());
+								stepCount.saveInBackground();
+									
+								finish();
 							} else {
 								Toast.makeText(getApplicationContext(),
 										"Sign up Error", Toast.LENGTH_LONG)
@@ -73,11 +90,12 @@ public class SignUpActivity extends Activity {
 							}
 						}
 					});
-				}
-			}
-		});
-	
 
+				}
+			
+			}
+			
+		});
 }
 
 	@Override
