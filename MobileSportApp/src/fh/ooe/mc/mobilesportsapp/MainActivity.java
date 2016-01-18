@@ -1,5 +1,11 @@
 package fh.ooe.mc.mobilesportsapp;
 
+import com.parse.Parse;
+import com.parse.ParseACL;
+import com.parse.ParseAnonymousUtils;
+import com.parse.ParseUser;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -33,7 +39,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-
+    
 		// mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
@@ -43,9 +49,35 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 		
-
+		Parse.initialize(this, "lflIbMjfPWl23Hdqj6Z7EMjuqBix8YreTIwNkJLh", "cTLgLxd1ybMeH5roNY6a83xDyUHEaVzyp9KMwNC0");
+		 
+        ParseUser.enableAutomaticUser();
+        ParseACL defaultACL = new ParseACL();
+ 
+        // If you would like all objects to be private by default, remove this
+        // line.
+        defaultACL.setPublicReadAccess(true);
+ 
+        ParseACL.setDefaultACL(defaultACL, true);
+        
+        if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+			// If user is anonymous, send the user to LoginSignupActivity.class
+			Intent intent = new Intent(MainActivity.this,
+					LoginSignupActivity.class);
+			startActivity(intent);
+		} else {
+			// If current user is NOT anonymous user
+			// Get current user data from Parse.com
+			ParseUser currentUser = ParseUser.getCurrentUser();
+			if (currentUser == null) {
+				// Send user to LoginSignupActivity.class
+				Intent intent = new Intent(MainActivity.this,
+						LoginSignupActivity.class);
+				startActivity(intent);
+				finish();
+			}
+		}
 	}
-
 
 	protected void onResume() {
 		super.onResume();

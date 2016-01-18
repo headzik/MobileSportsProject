@@ -1,12 +1,16 @@
 package fh.ooe.mc.mobilesportsapp;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,10 +39,12 @@ public class HeartRateFragment extends Fragment {
 	private Button btnStartStop;
 	private boolean activityStarted = false;
 	private ImageView ivHeart;
+	private int seconds = 0;
 	private Handler handler = new Handler();
 	private Runnable runnable = new Runnable() {
 		@Override
 		public void run() {
+
 			session.duration++;
 
 			String x = tvHeartrate.getText().toString();
@@ -53,8 +60,10 @@ public class HeartRateFragment extends Fragment {
 				ivHeart.setLayoutParams(p);
 
 			}
+			
 			int min = session.duration / 60;
 			int sec = session.duration % 60;
+
 			String smin = String.valueOf(min);
 			String ssec = String.valueOf(sec);
 			if (min < 10) {
@@ -69,6 +78,7 @@ public class HeartRateFragment extends Fragment {
 		}
 	};
 	BluetoothGatt mBluetoothGatt;
+	private List<Integer> heartValues = new ArrayList<Integer>();
 	public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
 	public final static UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -115,6 +125,7 @@ public class HeartRateFragment extends Fragment {
 							tvAvgHeartrate.setText(String.valueOf(session.avgHeartRate));
 						}
 						tvMinHeartrate.setText(String.valueOf(minVal));
+
 					}
 				});
 
@@ -201,6 +212,8 @@ public class HeartRateFragment extends Fragment {
 		btAdapter.startLeScan(leScanCallback);
 
 		btnStartStop.setOnClickListener(new OnClickListener() {
+			// Timer timer = new Timer();
+
 			@Override
 			public void onClick(View v) {
 				if (!activityStarted) {
@@ -213,6 +226,7 @@ public class HeartRateFragment extends Fragment {
 					handler.removeCallbacks(runnable);
 				}
 				activityStarted = !activityStarted;
+
 			}
 		});
 

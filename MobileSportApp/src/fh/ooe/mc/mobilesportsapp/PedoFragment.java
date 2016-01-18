@@ -3,6 +3,12 @@ package fh.ooe.mc.mobilesportsapp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -15,7 +21,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -33,14 +38,14 @@ public class PedoFragment extends Fragment {
 	private ProgressBar mProgressBarKm;
 	private ProgressBar mProgressBarSpeed;
 	private final int STEPS_TO_REACH = 700;
-	private EditText mEtHeight;
-	private EditText mEtWeight;
+
 	private TextView mTvCal;
 	private TextView mTvDistance;
 	private TextView mTvSpeed;
 	private SensorManager mSensorManager;
+	private ParseUser user;
+	private ParseObject stepCount;
 
-	
 	
 	public static PedoFragment newInstance() {
 		PedoFragment fragment = new PedoFragment();
@@ -62,7 +67,8 @@ public class PedoFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-		
+
+		user = ParseUser.getCurrentUser();
 		mTvNumSteps = (TextView) rootView.findViewById(R.id.tv_numsteps);
 		mProgressBarNumSteps = (ProgressBar) rootView.findViewById(R.id.progressBar);
 		mProgressBarCalories = (ProgressBar) rootView.findViewById(R.id.progressBar_calories);
@@ -71,8 +77,7 @@ public class PedoFragment extends Fragment {
 		// TODO get todays steps from server
 		mTvNumSteps.setText("0");
 		mProgressBarNumSteps.setProgress(0);
-		mEtHeight = (EditText) rootView.findViewById(R.id.et_height);
-		mEtWeight = (EditText) rootView.findViewById(R.id.et_weight);
+
 		mTvCal = (TextView) rootView.findViewById(R.id.tv_calories);
 		mTvDistance = (TextView) rootView.findViewById(R.id.tv_km);
 		mTvSpeed = (TextView) rootView.findViewById(R.id.tv_kmh);
@@ -83,14 +88,28 @@ public class PedoFragment extends Fragment {
 		mNumSteps = 0;
 		mAcceleration = 0.0f;
 		enableAccelerometerListening();
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("stepCount")
+		.whereEqualTo("user", user);
+		
+		query.getFirstInBackground(new GetCallback<ParseObject>() {
+		public void done(ParseObject object, ParseException e) {
+		    if (object == null) {
+		      Log.i("score", "The getFirst request failed.");
+		    } else {
+		      Log.i("score", "Retrieved the object.");
+		      stepCount = object;
+		    }
+		  }
+		});
+		
+		
 		return rootView;
 	}
 
 	private int updateSmallCircles() {
-		if (mEtHeight.getText() != null && mEtWeight.getText() != null) {
-			double height = Integer.valueOf(mEtHeight.getText().toString());
-			double weight = Integer.valueOf(mEtWeight.getText().toString());
-
+			double height =  user.getDouble("height");
+			double weight =  user.getDouble("weight");
+			
 			final double walkingFactor = 0.57;
 			double CaloriesBurnedPerMile;
 			double strip;
@@ -122,7 +141,7 @@ public class PedoFragment extends Fragment {
 				mProgressBarSpeed.setBackgroundColor(Color.GREEN);
 			} else {
 				mProgressBarSpeed.setBackgroundColor(Color.RED);
-			}
+			
 		}
 		return 0;
 	}
@@ -148,6 +167,8 @@ public class PedoFragment extends Fragment {
 						mProgressBarNumSteps.setProgress((int) percent);
 						mProgressBarNumSteps.refreshDrawableState();
 
+						stepCount.put("numberOfSteps", mNumSteps);
+						stepCount.saveInBackground();
 					}
 				});
 			}
