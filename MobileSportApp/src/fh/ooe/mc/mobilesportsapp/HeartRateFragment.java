@@ -34,6 +34,7 @@ public class HeartRateFragment extends Fragment {
 	private TextView tvAvgHeartrate;
 	private TextView tvMaxHeartrate;
 	private TextView tvMinHeartrate;
+	private TrainingSession session;
 	private TextView tvTime;
 	private Button btnStartStop;
 	private boolean activityStarted = false;
@@ -43,11 +44,11 @@ public class HeartRateFragment extends Fragment {
 	private Runnable runnable = new Runnable() {
 		@Override
 		public void run() {
-			seconds++;
+			session.duration++;
 
 			String x = tvHeartrate.getText().toString();
 			if (x != null && !x.equals("---")) {
-				heartValues.add(Integer.parseInt(x));
+				session.heartValues.add(Integer.parseInt(x));
 
 				LayoutParams p = (LayoutParams) ivHeart.getLayoutParams();
 				if (p.height == 100){
@@ -58,8 +59,8 @@ public class HeartRateFragment extends Fragment {
 				ivHeart.setLayoutParams(p);
 
 			}
-			int min = seconds / 60;
-			int sec = seconds % 60;
+			int min = session.duration / 60;
+			int sec = session.duration % 60;
 			String smin = String.valueOf(min);
 			String ssec = String.valueOf(sec);
 			if (min < 10) {
@@ -74,7 +75,6 @@ public class HeartRateFragment extends Fragment {
 		}
 	};
 	BluetoothGatt mBluetoothGatt;
-	private List<Integer> heartValues = new ArrayList<Integer>();
 	public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
 	public final static UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -108,13 +108,12 @@ public class HeartRateFragment extends Fragment {
 						Log.i("hey", "data = " + x);
 						tvHeartrate.setText(String.valueOf(x));
 						ivHeart.setImageDrawable(getResources().getDrawable(R.drawable.heart_red));
-						int avg = 0;
-						if (heartValues.size() > 0) {
-							for (int val : heartValues) {
-								avg += val;
+						if (session.heartValues.size() > 0) {
+							for (int val : session.heartValues) {
+								session.avgHeartRate += val;
 							}
-							avg = avg / heartValues.size();
-							tvAvgHeartrate.setText(String.valueOf(avg));
+							session.avgHeartRate = session.avgHeartRate / session.heartValues.size();
+							tvAvgHeartrate.setText(String.valueOf(session.avgHeartRate));
 						}
 					}
 				});
@@ -202,24 +201,18 @@ public class HeartRateFragment extends Fragment {
 		btAdapter.startLeScan(leScanCallback);
 
 		btnStartStop.setOnClickListener(new OnClickListener() {
-			// Timer timer = new Timer();
-
 			@Override
 			public void onClick(View v) {
 				if (!activityStarted) {
 					btnStartStop.setBackgroundResource(R.drawable.stop);
-					seconds = 0;
+					session = new TrainingSession();
 					tvTime.setText("00:00");
 					handler.postDelayed(runnable, 1000);
-
 				} else {
 					btnStartStop.setBackgroundResource(R.drawable.start);
-					
 					handler.removeCallbacks(runnable);
-					// timer.cancel();
 				}
 				activityStarted = !activityStarted;
-
 			}
 		});
 
