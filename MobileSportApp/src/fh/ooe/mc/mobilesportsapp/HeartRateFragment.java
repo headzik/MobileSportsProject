@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.parse.ParseUser;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -39,12 +41,11 @@ public class HeartRateFragment extends Fragment {
 	private Button btnStartStop;
 	private boolean activityStarted = false;
 	private ImageView ivHeart;
-	private int seconds = 0;
+	// private ParseUser user = new ParseUser();
 	private Handler handler = new Handler();
 	private Runnable runnable = new Runnable() {
 		@Override
 		public void run() {
-
 			session.duration++;
 
 			String x = tvHeartrate.getText().toString();
@@ -60,10 +61,8 @@ public class HeartRateFragment extends Fragment {
 				ivHeart.setLayoutParams(p);
 
 			}
-			
 			int min = session.duration / 60;
 			int sec = session.duration % 60;
-
 			String smin = String.valueOf(min);
 			String ssec = String.valueOf(sec);
 			if (min < 10) {
@@ -78,7 +77,6 @@ public class HeartRateFragment extends Fragment {
 		}
 	};
 	BluetoothGatt mBluetoothGatt;
-	private List<Integer> heartValues = new ArrayList<Integer>();
 	public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
 	public final static UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -111,9 +109,11 @@ public class HeartRateFragment extends Fragment {
 					public void run() {
 						Log.i("hey", "data = " + x);
 						tvHeartrate.setText(String.valueOf(x));
+						int minVal = 0;
 						ivHeart.setImageDrawable(getResources().getDrawable(R.drawable.heart_red));
-						int minVal = session.heartValues.get(session.heartValues.size() - 1);
-						if (session.heartValues.size() > 0) {
+						if (session != null && session.heartValues.size() > 0) {
+							 minVal = session.heartValues.get(session.heartValues.size() - 1);
+
 							for (int val : session.heartValues) {
 								if (val < minVal) {
 									minVal = val;
@@ -124,8 +124,15 @@ public class HeartRateFragment extends Fragment {
 							session.avgHeartRate = session.avgHeartRate / session.heartValues.size();
 							tvAvgHeartrate.setText(String.valueOf(session.avgHeartRate));
 						}
+						// int age = user.getInt("age");
+						// TODO replace
+						double age = 21;
+						double max = 220 - age;
+						if (session != null && session.heartValues.size() > 0) {
+							double percent = session.heartValues.get(session.heartValues.size() - 1) / max * 100;
+							tvMaxHeartrate.setText(String.valueOf((int)percent) + "%");
+						}
 						tvMinHeartrate.setText(String.valueOf(minVal));
-
 					}
 				});
 
@@ -212,8 +219,6 @@ public class HeartRateFragment extends Fragment {
 		btAdapter.startLeScan(leScanCallback);
 
 		btnStartStop.setOnClickListener(new OnClickListener() {
-			// Timer timer = new Timer();
-
 			@Override
 			public void onClick(View v) {
 				if (!activityStarted) {
@@ -226,7 +231,6 @@ public class HeartRateFragment extends Fragment {
 					handler.removeCallbacks(runnable);
 				}
 				activityStarted = !activityStarted;
-
 			}
 		});
 

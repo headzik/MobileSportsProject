@@ -35,7 +35,6 @@ public class SettingsFragment extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-		
 		etHeight = (EditText) rootView.findViewById(R.id.et_height);
 		etWeight = (EditText) rootView.findViewById(R.id.et_weight);
 		etAge = (EditText) rootView.findViewById(R.id.et_age);
@@ -102,6 +101,7 @@ public class SettingsFragment extends Fragment{
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked){
 					prefs.edit().putBoolean("isMale", true).commit();
+					rbFemale.setChecked(false);
 				}else{
 					prefs.edit().putBoolean("isMale", false).commit();
 				}
@@ -114,6 +114,7 @@ public class SettingsFragment extends Fragment{
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked){
 					prefs.edit().putBoolean("isFemale", true).commit();
+					rbMale.setChecked(false);
 				}else{
 					prefs.edit().putBoolean("isFemale", false).commit();
 				}
@@ -122,6 +123,6 @@ public class SettingsFragment extends Fragment{
 		return rootView;
 	}
 	
-	
+
 }
 

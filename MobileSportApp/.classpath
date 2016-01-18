@@ -9,5 +9,7 @@
 	<classpathentry kind="lib" path="C:/Users/Katharina/android-sdks/extras/android/support/v13/android-support-v13.jar"/>
 	<classpathentry kind="lib" path="libs/mpandroidchartlibrary-2-1-6.jar"/>
 	<classpathentry kind="lib" path="libs/androidapi.jar"/>
+	<classpathentry kind="lib" path="libs/bolts-tasks-1.3.0.jar"/>
+	<classpathentry kind="lib" path="libs/Parse-1.11.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
