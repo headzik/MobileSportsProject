@@ -1,16 +1,12 @@
 package fh.ooe.mc.mobilesportsapp;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -39,7 +34,6 @@ public class HeartRateFragment extends Fragment {
 	private Button btnStartStop;
 	private boolean activityStarted = false;
 	private ImageView ivHeart;
-	private int seconds = 0;
 	private Handler handler = new Handler();
 	private Runnable runnable = new Runnable() {
 		@Override
@@ -51,9 +45,9 @@ public class HeartRateFragment extends Fragment {
 				session.heartValues.add(Integer.parseInt(x));
 
 				LayoutParams p = (LayoutParams) ivHeart.getLayoutParams();
-				if (p.height == 100){
+				if (p.height == 100) {
 					p.height = 80;
-				}else{
+				} else {
 					p.height = 100;
 				}
 				ivHeart.setLayoutParams(p);
@@ -108,13 +102,19 @@ public class HeartRateFragment extends Fragment {
 						Log.i("hey", "data = " + x);
 						tvHeartrate.setText(String.valueOf(x));
 						ivHeart.setImageDrawable(getResources().getDrawable(R.drawable.heart_red));
+						int minVal = session.heartValues.get(session.heartValues.size() - 1);
 						if (session.heartValues.size() > 0) {
 							for (int val : session.heartValues) {
+								if (val < minVal) {
+									minVal = val;
+								}
 								session.avgHeartRate += val;
 							}
+
 							session.avgHeartRate = session.avgHeartRate / session.heartValues.size();
 							tvAvgHeartrate.setText(String.valueOf(session.avgHeartRate));
 						}
+						tvMinHeartrate.setText(String.valueOf(minVal));
 					}
 				});
 
