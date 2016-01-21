@@ -3,6 +3,13 @@ package fh.ooe.mc.mobilesportsapp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -15,12 +22,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class PedoFragment extends Fragment {
-
+	
 	private static final String ARG_SECTION_NUMBER = "section_number";
 	private float mAcceleration;
 	private float mCurrentY;
@@ -33,14 +39,15 @@ public class PedoFragment extends Fragment {
 	private ProgressBar mProgressBarKm;
 	private ProgressBar mProgressBarSpeed;
 	private final int STEPS_TO_REACH = 700;
-	private EditText mEtHeight;
-	private EditText mEtWeight;
+
 	private TextView mTvCal;
 	private TextView mTvDistance;
 	private TextView mTvSpeed;
 	private SensorManager mSensorManager;
+	private ParseUser user;
+	private ParseObject stepCount;
+	private Welcome mActivity;
 
-	
 	
 	public static PedoFragment newInstance() {
 		PedoFragment fragment = new PedoFragment();
@@ -56,23 +63,28 @@ public class PedoFragment extends Fragment {
 		mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
 		mSensorManager.registerListener(mSensorEventListener,
 				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-
 	}
 	
+	 @Override
+	 public void onAttach(Activity activity) {
+	        super.onAttach(activity);
+	        mActivity = (Welcome) activity;
+	    }
+	 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-		
+
+		user = ParseUser.getCurrentUser();
+		getStepCount();
 		mTvNumSteps = (TextView) rootView.findViewById(R.id.tv_numsteps);
 		mProgressBarNumSteps = (ProgressBar) rootView.findViewById(R.id.progressBar);
 		mProgressBarCalories = (ProgressBar) rootView.findViewById(R.id.progressBar_calories);
 		mProgressBarKm = (ProgressBar) rootView.findViewById(R.id.progressBar_km);
 		mProgressBarSpeed = (ProgressBar) rootView.findViewById(R.id.progressBar_kmh);
 		// TODO get todays steps from server
-		mTvNumSteps.setText("0");
 		mProgressBarNumSteps.setProgress(0);
-		mEtHeight = (EditText) rootView.findViewById(R.id.et_height);
-		mEtWeight = (EditText) rootView.findViewById(R.id.et_weight);
+
 		mTvCal = (TextView) rootView.findViewById(R.id.tv_calories);
 		mTvDistance = (TextView) rootView.findViewById(R.id.tv_km);
 		mTvSpeed = (TextView) rootView.findViewById(R.id.tv_kmh);
@@ -80,17 +92,63 @@ public class PedoFragment extends Fragment {
 		mTreshold = 10;
 		mCurrentY = 0;
 		mPreviousY = 0;
-		mNumSteps = 0;
 		mAcceleration = 0.0f;
 		enableAccelerometerListening();
+
+		mTvNumSteps.setText(Integer.toString(mNumSteps));
+				
 		return rootView;
+	}
+	
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		user = ParseUser.getCurrentUser();
+		getStepCount();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		user = ParseUser.getCurrentUser();
+		getStepCount();
+		stepCount.put("numberOfSteps", mNumSteps);
+		stepCount.saveInBackground();
+	}
+	
+	private void getStepCount() {
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("stepCount")
+				.whereEqualTo("user", user);
+				query.getFirstInBackground(new GetCallback<ParseObject>() {
+				public void done(ParseObject object, ParseException e) {
+				    if (object == null) {
+				      Log.i("QueryStatus", "Couldn't retrieve the object.");
+				    } else {
+				      Log.i("QueryStatus", "Retrieved the object.");
+				      stepCount = object;
+				      afterRetrieving();
+				    }
+				  }
+				});
+	}
+	
+	private void afterRetrieving() {
+		if(stepCount != null) {
+			mNumSteps = stepCount.getInt("numberOfSteps");	
+		} else {
+			mNumSteps = 0;
+		}
+		mTvNumSteps.setText(Integer.toString(mNumSteps));
+		float percent = (float) ((float) mNumSteps / (float) STEPS_TO_REACH) * 100;
+		mProgressBarNumSteps.setProgress((int) percent);
+		mProgressBarNumSteps.refreshDrawableState();
 	}
 
 	private int updateSmallCircles() {
-		if (mEtHeight.getText() != null && mEtWeight.getText() != null) {
-			double height = Integer.valueOf(mEtHeight.getText().toString());
-			double weight = Integer.valueOf(mEtWeight.getText().toString());
-
+			double height =  user.getDouble("height");
+			double weight =  user.getDouble("weight");
+			
 			final double walkingFactor = 0.57;
 			double CaloriesBurnedPerMile;
 			double strip;
@@ -117,12 +175,11 @@ public class PedoFragment extends Fragment {
 			mTvSpeed.setText(String.valueOf(formatter.format(bmi)));
 			if (bmi < 18.5) {
 				mProgressBarSpeed.setBackgroundColor(Color.RED);
-
 			} else if (bmi < 24.9) {
 				mProgressBarSpeed.setBackgroundColor(Color.GREEN);
 			} else {
 				mProgressBarSpeed.setBackgroundColor(Color.RED);
-			}
+			
 		}
 		return 0;
 	}
@@ -140,14 +197,13 @@ public class PedoFragment extends Fragment {
 				mTvNumSteps.setText(String.valueOf(mNumSteps));
 				if (mNumSteps > 80)
 					updateSmallCircles();
-				getActivity().runOnUiThread(new Runnable() {
+				mActivity.runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
 						float percent = (float) ((float) mNumSteps / (float) STEPS_TO_REACH) * 100;
 						mProgressBarNumSteps.setProgress((int) percent);
 						mProgressBarNumSteps.refreshDrawableState();
-
 					}
 				});
 			}
