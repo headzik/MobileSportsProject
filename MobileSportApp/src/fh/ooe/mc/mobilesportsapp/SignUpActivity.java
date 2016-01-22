@@ -7,54 +7,82 @@ import com.parse.SignUpCallback;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 public class SignUpActivity extends Activity {
-
-	Button signup;
-	String usernametxt;
-	String passwordtxt;
-	String emailtxt;
-	double heighttxt;
-	double weighttxt;
-	double agetxt;
 	
-	EditText password;
-	EditText username;
-	EditText email;
-	EditText height;
-	EditText weight;
-	EditText age;
+	private String usernametxt;
+	private String passwordtxt;
+	private String emailtxt;
+	private String gendertxt;
+	private double stepLengthnum;
+	private double heightnum;
+	private double weightnum;
+	private double agenum;
+	
+	private EditText etPassword;
+	private EditText etUsername;
+	private EditText etEmail;
+	private EditText etWeight;
+	private EditText etHeight;
+	private EditText etAge;
+	private EditText etStepLength;
+	private RadioGroup rgGender;
+	private Button bSignup;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sign_up);
 		
-		username = (EditText) findViewById(R.id.username);
-		password = (EditText) findViewById(R.id.password);
-		email = (EditText) findViewById(R.id.email);
-		height = (EditText) findViewById(R.id.height);
-		weight = (EditText) findViewById(R.id.weight);
-		age = (EditText) findViewById(R.id.age);
- 
-		signup = (Button) findViewById(R.id.signup);
+		etUsername = (EditText) findViewById(R.id.username);
+		etPassword = (EditText) findViewById(R.id.password);
+		etEmail = (EditText) findViewById(R.id.email);
+		etHeight = (EditText) findViewById(R.id.height);
+		etWeight = (EditText) findViewById(R.id.weight);
+		etAge = (EditText) findViewById(R.id.age);
+		rgGender = (RadioGroup) findViewById(R.id.gender);
+		etStepLength = (EditText) findViewById(R.id.step_length);
+		bSignup = (Button) findViewById(R.id.signup);
 		
-		signup.setOnClickListener(new OnClickListener() {
+		rgGender.clearCheck();
+		
+		rgGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton rb = (RadioButton) group.findViewById(checkedId);
+                if(rb != null && checkedId > -1){
+                    if(checkedId == R.id.radioButtonMale) {
+                    	gendertxt = "M";
+                    	Log.i("a", "m");
+                    } else if(checkedId == R.id.radioButtonFemale) {
+                    	gendertxt = "F";
+                    	Log.i("a", "f");
+                    }
+                }
+
+            }
+        });
+		
+		bSignup.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
-				usernametxt = username.getText().toString();
-				passwordtxt = password.getText().toString();
-				emailtxt = email.getText().toString();
-				heighttxt = Double.parseDouble(height.getText().toString());
-				weighttxt = Double.parseDouble(weight.getText().toString());
-				agetxt = Double.parseDouble(age.getText().toString());
-				
+				usernametxt = etUsername.getText().toString();
+				passwordtxt = etPassword.getText().toString();
+				emailtxt = etEmail.getText().toString();
+				heightnum = Integer.valueOf(etHeight.getText().toString());
+				weightnum = Integer.valueOf(etWeight.getText().toString());
+				agenum = Integer.valueOf(etAge.getText().toString());
+				stepLengthnum = Integer.valueOf(etStepLength.getText().toString());
+								
 				// Force user to fill up the form
 				if (usernametxt.equals("") || passwordtxt.equals("") || emailtxt.equals("")) {
 					Toast.makeText(getApplicationContext(),
@@ -66,9 +94,11 @@ public class SignUpActivity extends Activity {
 					user.setUsername(usernametxt);
 					user.setPassword(passwordtxt);
 					user.setEmail(emailtxt);
-					user.put("height", heighttxt);
-					user.put("weight", weighttxt);
-					user.put("age", agetxt);
+					user.put("height", heightnum);
+					user.put("weight", weightnum);
+					user.put("age", agenum);
+					user.put("gender", gendertxt);
+					user.put("stepLength", stepLengthnum);
 					
 					user.signUpInBackground(new SignUpCallback() {
 						public void done(ParseException e) {

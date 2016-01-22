@@ -38,7 +38,7 @@ public class PedoFragment extends Fragment {
 	private ProgressBar mProgressBarCalories;
 	private ProgressBar mProgressBarKm;
 	private ProgressBar mProgressBarSpeed;
-	private final int STEPS_TO_REACH = 700;
+	private final int STEPS_TO_REACH = 7000;
 
 	private TextView mTvCal;
 	private TextView mTvDistance;
@@ -70,6 +70,13 @@ public class PedoFragment extends Fragment {
 	        super.onAttach(activity);
 	        mActivity = (Welcome) activity;
 	    }
+	 
+	 @Override
+	 public void onDestroy() {
+	        super.onDestroy();
+	        mActivity = null;
+	    }
+	 
 	 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -143,6 +150,8 @@ public class PedoFragment extends Fragment {
 		float percent = (float) ((float) mNumSteps / (float) STEPS_TO_REACH) * 100;
 		mProgressBarNumSteps.setProgress((int) percent);
 		mProgressBarNumSteps.refreshDrawableState();
+		if(mNumSteps > 80)
+			updateSmallCircles();
 	}
 
 	private int updateSmallCircles() {

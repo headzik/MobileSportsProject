@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -39,7 +42,7 @@ public class HeartRateFragment extends Fragment {
 	private Button btnStartStop;
 	private boolean activityStarted = false;
 	private ImageView ivHeart;
-	// private ParseUser user = new ParseUser();
+	private ParseUser user;
 	private Handler handler = new Handler();
 	private Runnable runnable = new Runnable() {
 		@Override
@@ -59,18 +62,7 @@ public class HeartRateFragment extends Fragment {
 				ivHeart.setLayoutParams(p);
 
 			}
-			int min = session.duration / 60;
-			int sec = session.duration % 60;
-			String smin = String.valueOf(min);
-			String ssec = String.valueOf(sec);
-			if (min < 10) {
-				smin = "0" + smin;
-			}
-			if (sec < 10) {
-				ssec = "0" + ssec;
-			}
-			String s = smin + ":" + ssec;
-			tvTime.setText(s);
+			tvTime.setText(toMinutes());
 			handler.postDelayed(this, 1000);
 		}
 	};
@@ -122,9 +114,7 @@ public class HeartRateFragment extends Fragment {
 							session.avgHeartRate = session.avgHeartRate / session.heartValues.size();
 							tvAvgHeartrate.setText(String.valueOf(session.avgHeartRate));
 						}
-						// int age = user.getInt("age");
-						// TODO replace
-						double age = 21;
+						int age = user.getInt("age");
 						double max = 220 - age;
 						if (session != null && session.heartValues.size() > 0) {
 							double percent = session.heartValues.get(session.heartValues.size() - 1) / max * 100;
@@ -206,8 +196,10 @@ public class HeartRateFragment extends Fragment {
 		btnStartStop = (Button) rootView.findViewById(R.id.buttonStartStop);
 		ivHeart = (ImageView) rootView.findViewById(R.id.iv_heart);
 		tvTime = (TextView) rootView.findViewById(R.id.tvTime);
+		
+		user = ParseUser.getCurrentUser();
+		
 		BluetoothManager btManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
-
 		BluetoothAdapter btAdapter = btManager.getAdapter();
 		if (btAdapter != null && !btAdapter.isEnabled()) {
 			Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -224,14 +216,35 @@ public class HeartRateFragment extends Fragment {
 					session = new TrainingSession();
 					tvTime.setText("00:00");
 					handler.postDelayed(runnable, 1000);
+					
 				} else {
 					btnStartStop.setBackgroundResource(R.drawable.start);
 					handler.removeCallbacks(runnable);
+					ParseObject trainingSession = new ParseObject("TrainingSession");
+					trainingSession.put("user", user);
+					trainingSession.put("duration", toMinutes());
+					trainingSession.put("avgHeartRate", session.avgHeartRate);
+					trainingSession.saveInBackground();
+					
 				}
 				activityStarted = !activityStarted;
 			}
 		});
 
 		return rootView;
+	}
+	
+	public String toMinutes() {
+		int min = session.duration / 60;
+		int sec = session.duration % 60;
+		String smin = String.valueOf(min);
+		String ssec = String.valueOf(sec);
+		if (min < 10) {
+			smin = "0" + smin;
+		}
+		if (sec < 10) {
+			ssec = "0" + ssec;
+		}
+		return smin + ":" + ssec;
 	}
 }
