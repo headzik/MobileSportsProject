@@ -53,22 +53,34 @@ public class Welcome extends ActionBarActivity implements NavigationDrawerCallba
 		case 0:
 			setTitle(getString(R.string.title_section1));
 			if (mFragment instanceof PedoFragment) {
-			    return;
+				return;
 			} else {
 				fragmentManager.beginTransaction().replace(R.id.container, PedoFragment.newInstance()).commit();
 			}
 			break;
 		case 1:
 			setTitle(getString(R.string.title_section2));
-			fragmentManager.beginTransaction().replace(R.id.container, StatisticsFragment.newInstance()).commit();
+			if (mFragment instanceof StatisticsFragment) {
+				return;
+			} else {
+				fragmentManager.beginTransaction().replace(R.id.container, StatisticsFragment.newInstance()).commit();
+			}
 			break;
 		case 2:
 			setTitle(getString(R.string.title_section3));
-			fragmentManager.beginTransaction().replace(R.id.container, HeartRateFragment.newInstance()).commit();
+			if (mFragment instanceof HeartRateFragment) {
+				return;
+			} else {
+				fragmentManager.beginTransaction().replace(R.id.container, HeartRateFragment.newInstance()).commit();
+			}
 			break;
 		case 3:
 			setTitle(getString(R.string.title_section4));
-			fragmentManager.beginTransaction().replace(R.id.container, SettingsFragment.newInstance()).commit();
+			if (mFragment instanceof SettingsFragment) {
+				return;
+			} else {
+				fragmentManager.beginTransaction().replace(R.id.container, SettingsFragment.newInstance()).commit();
+			}
 			break;
 		}
 

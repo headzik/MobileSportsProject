@@ -1,13 +1,11 @@
 package fh.ooe.mc.mobilesportsapp;
 
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,13 +61,10 @@ public class SignUpActivity extends Activity {
                 if(rb != null && checkedId > -1){
                     if(checkedId == R.id.radioButtonMale) {
                     	gendertxt = "M";
-                    	Log.i("a", "m");
                     } else if(checkedId == R.id.radioButtonFemale) {
                     	gendertxt = "F";
-                    	Log.i("a", "f");
                     }
                 }
-
             }
         });
 		
@@ -107,11 +102,6 @@ public class SignUpActivity extends Activity {
 								Toast.makeText(getApplicationContext(),
 										"Successfully Signed up, please log in.",
 										Toast.LENGTH_LONG).show();
-								
-								ParseObject stepCount = new ParseObject("stepCount");
-								stepCount.put("user", ParseUser.getCurrentUser());
-								stepCount.saveInBackground();
-									
 								finish();
 							} else {
 								Toast.makeText(getApplicationContext(),

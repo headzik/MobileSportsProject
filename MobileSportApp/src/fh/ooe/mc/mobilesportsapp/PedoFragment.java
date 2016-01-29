@@ -2,6 +2,7 @@ package fh.ooe.mc.mobilesportsapp;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Calendar;
 
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -69,12 +70,22 @@ public class PedoFragment extends Fragment {
 	 public void onAttach(Activity activity) {
 	        super.onAttach(activity);
 	        mActivity = (Welcome) activity;
+	        if(mActivity != null) {
+		        Log.i("check", "stworzony");
+		        } else {
+		        Log.i("check", "shiitO");
+		        }
 	    }
 	 
 	 @Override
 	 public void onDestroy() {
 	        super.onDestroy();
-	        mActivity = null;
+	      //  mActivity = null;
+	        if(mActivity == null) {
+		        Log.i("check", "zniszczony");
+		        } else {
+		        Log.i("check", "shiitD");
+		        }
 	    }
 	 
 	 
@@ -107,14 +118,15 @@ public class PedoFragment extends Fragment {
 		return rootView;
 	}
 	
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		user = ParseUser.getCurrentUser();
-		getStepCount();
+	public void createStepCount()
+	{
+		stepCount = new ParseObject("stepCount");
+	    stepCount.put("user", ParseUser.getCurrentUser());
+	    mNumSteps = 0;
+		stepCount.put("numberOfSteps", mNumSteps);
+	    stepCount.saveInBackground();
 	}
-
+		
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -126,18 +138,34 @@ public class PedoFragment extends Fragment {
 	
 	private void getStepCount() {
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("stepCount")
-				.whereEqualTo("user", user);
+				.whereEqualTo("user", user)
+				.orderByDescending("createdAt");
 				query.getFirstInBackground(new GetCallback<ParseObject>() {
 				public void done(ParseObject object, ParseException e) {
 				    if (object == null) {
 				      Log.i("QueryStatus", "Couldn't retrieve the object.");
+				      createStepCount();
 				    } else {
 				      Log.i("QueryStatus", "Retrieved the object.");
-				      stepCount = object;
-				      afterRetrieving();
-				    }
+				      checkDate(object);
+				     }
 				  }
 				});
+	}
+	
+	private void checkDate(ParseObject object) {
+		Calendar dateOfCreation = Calendar.getInstance();
+		dateOfCreation.setTime(object.getCreatedAt());
+		int dayOfCreation = dateOfCreation.get(Calendar.DAY_OF_MONTH);
+		Calendar currentDate = Calendar.getInstance();
+		int today = currentDate.get(Calendar.DAY_OF_MONTH);
+		
+		if(Math.abs(dayOfCreation - today) > 0) {	
+			createStepCount();
+		} else {
+			stepCount = object;
+			afterRetrieving();
+		}
 	}
 	
 	private void afterRetrieving() {
@@ -182,13 +210,10 @@ public class PedoFragment extends Fragment {
 			Log.i("hey", String.valueOf(height) + " w:" + String.valueOf(weight));
 			double bmi = weight / (height * height);
 			mTvSpeed.setText(String.valueOf(formatter.format(bmi)));
-			if (bmi < 18.5) {
-				mProgressBarSpeed.setBackgroundColor(Color.RED);
-			} else if (bmi < 24.9) {
+			if (bmi < 24.9 && bmi > 18.5) {
 				mProgressBarSpeed.setBackgroundColor(Color.GREEN);
 			} else {
 				mProgressBarSpeed.setBackgroundColor(Color.RED);
-			
 		}
 		return 0;
 	}
@@ -206,6 +231,11 @@ public class PedoFragment extends Fragment {
 				mTvNumSteps.setText(String.valueOf(mNumSteps));
 				if (mNumSteps > 80)
 					updateSmallCircles();
+				if(mActivity != null) {
+			        Log.i("check", "ok");
+			        } else {
+			        Log.i("check", "shiit");
+			        }
 				mActivity.runOnUiThread(new Runnable() {
 
 					@Override
